@@ -1,3 +1,4 @@
+// Development builds are published automatically from this branch.
 const CARD_VERSION = "0.1.0-dev.1";
 
 const FEATURES = { PAUSE: 4, STOP: 8, RETURN_HOME: 16, LOCATE: 512, CLEAN_SPOT: 1024, START: 8192 };
