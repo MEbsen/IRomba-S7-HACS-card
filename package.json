@@ -1,0 +1,13 @@
+{
+  "name": "iroomba-s7-card",
+  "version": "0.1.0-dev.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "smoke": "node scripts/smoke-test.mjs dist/iroomba-s7-card.js",
+    "check": "npm run build && node --check dist/iroomba-s7-card.js && npm run smoke"
+  },
+  "keywords": ["home-assistant", "lovelace", "irobot", "roomba", "hacs"],
+  "license": "MIT"
+}
