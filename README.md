@@ -11,12 +11,12 @@ An animated Home Assistant dashboard card for an iRobot Roomba S7 exposed throug
 
 > **Unofficial project:** This independent community project is not affiliated with, endorsed by, or sponsored by iRobot Corporation. iRobot and Roomba are trademarks of their respective owner.
 
-## Planned first version
+## First test version
 
 - Animated states for docked, charging, cleaning, paused, returning, error and unavailable.
 - Controls shown only when the selected vacuum supports them.
 - Start, pause, stop, return-to-base and locate support.
-- Battery, charging and bin-full information discovered from the selected Home Assistant device.
+- Battery, charging, bin-full information and mission sensors discovered from the selected Home Assistant device.
 - Visual Home Assistant card editor.
 - Optional mission statistics.
 - Responsive design using Home Assistant theme colours.
