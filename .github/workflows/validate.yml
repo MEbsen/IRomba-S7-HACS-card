@@ -1,0 +1,26 @@
+name: Validate
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check required HACS files
+        run: |
+          test -f hacs.json
+          test -f README.md
+          test -f src/iroomba-s7-card.js
+          test -f iroomba-s7-card.js
+      - name: Build and smoke test
+        run: npm run check
+      - name: Validate HACS repository
+        uses: hacs/action@main
+        with:
+          category: plugin
