@@ -7,7 +7,7 @@
 
 An animated Home Assistant dashboard card for an iRobot Roomba S7 exposed through Home Assistant's official **iRobot Roomba and Braava** integration.
 
-> **Early development:** The first test build is `v0.1.0-dev.1`.
+> **Early development:** Configuration may change before v1.0.
 
 > **Unofficial project:** This independent community project is not affiliated with, endorsed by, or sponsored by iRobot Corporation. iRobot and Roomba are trademarks of their respective owner.
 
@@ -19,6 +19,8 @@ An animated Home Assistant dashboard card for an iRobot Roomba S7 exposed throug
 - Battery, charging, bin-full information and mission sensors discovered from the selected Home Assistant device.
 - Visual Home Assistant card editor.
 - Optional mission statistics.
+- Configurable filter and brush replacement countdowns based on days, missions or cleaning minutes.
+- Card-local reset buttons with warning and overdue states.
 - Responsive design using Home Assistant theme colours.
 
 The official Home Assistant integration does not expose the Roomba map, room zones or live position. This card intentionally focuses on status and controls and does not require Docker or a separate map service.
@@ -50,6 +52,10 @@ type: custom:iroomba-s7-card
 entity: vacuum.alfred
 title: Alfred
 show_stats: true
+filter_interval: 30
+filter_unit: runs
+brush_interval: 90
+brush_unit: days
 ```
 
 | Option | Type | Default | Description |
@@ -57,6 +63,12 @@ show_stats: true
 | `entity` | string | required | Vacuum entity from Home Assistant. |
 | `title` | string | entity name | Optional card title. |
 | `show_stats` | boolean | `true` | Show mission counters discovered on the same device. |
+| `filter_interval` | number | `0` | Filter replacement interval. Zero hides the counter. |
+| `filter_unit` | string | `runs` | `days`, `runs` or `minutes`. |
+| `brush_interval` | number | `0` | Brush replacement interval. Zero hides the counter. |
+| `brush_unit` | string | `runs` | `days`, `runs` or `minutes`. |
+
+Maintenance resets are stored locally in the browser for the selected vacuum. They survive reloads and browser restarts, but do not automatically synchronize to another browser or dashboard device.
 
 ## Development and releases
 
