@@ -1,5 +1,5 @@
-// Development builds are published automatically from this branch. Dust enters from the robot's forward direction.
-const CARD_VERSION = "0.2.0-dev.5";
+// Development builds are published automatically from this branch.
+const CARD_VERSION = "0.2.0-dev.6";
 
 const FEATURES = { PAUSE: 4, STOP: 8, RETURN_HOME: 16, LOCATE: 512, CLEAN_SPOT: 1024, START: 8192 };
 const STATE_META = {
@@ -16,7 +16,7 @@ const STATE_META = {
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 
 class IRoombaS7Card extends HTMLElement {
-  constructor() { super(); this.attachShadow({mode:"open"}); this._related={}; this._loaded=""; this._busy=""; }
+  constructor() { super(); this.attachShadow({mode:"open"}); this._related={}; this._loaded=""; this._busy=""; this._lastCommands={}; }
   static getStubConfig(hass) { return {entity:Object.keys(hass?.states||{}).find(id=>id.startsWith("vacuum."))||"",show_stats:true}; }
   static getConfigElement() { return document.createElement("iroomba-s7-card-editor"); }
   setConfig(config) { if(!config?.entity) throw new Error("Vælg en vacuum-entitet"); this._config={show_stats:true,...config}; this._loaded=""; this.render(); this._discover(); }
@@ -43,16 +43,24 @@ class IRoombaS7Card extends HTMLElement {
       }; this.render();
     } catch(error) { console.warn("iRoomba S7 Card: entity discovery failed",error); }
   }
-  async _call(service) {
-    if(!this._hass||this._busy)return; this._busy=service; this.render();
-    try { await this._hass.callService("vacuum",service,{entity_id:this._config.entity}); }
-    catch(error) { console.error(`iRoomba S7 Card: vacuum.${service} failed`,error); }
-    finally { this._busy=""; this.render(); }
+  _call(service) {
+    if(!this._hass)return;
+    const now=Date.now();
+    if(now-(this._lastCommands[service]||0)<600)return;
+    this._lastCommands[service]=now;
+    this._busy=service;
+    this.render();
+    let cleared=false;
+    const clear=()=>{if(cleared)return;cleared=true;if(this._busy===service){this._busy="";this.render();}};
+    const timeout=setTimeout(clear,1500);
+    Promise.resolve(this._hass.callService("vacuum",service,{entity_id:this._config.entity}))
+      .catch(error=>console.error(`iRoomba S7 Card: vacuum.${service} failed`,error))
+      .finally(()=>{clearTimeout(timeout);clear();});
   }
   _moreInfo(entityId) { if(entityId)this.dispatchEvent(new CustomEvent("hass-more-info",{detail:{entityId},bubbles:true,composed:true})); }
   _button(service,icon,label,show,primary=false) {
     if(!show)return ""; const busy=this._busy===service;
-    return `<button class="${primary?"primary":""}" data-service="${service}" ${this._busy?"disabled":""}><ha-icon class="${busy?"spin":""}" icon="${busy?"mdi:loading":icon}"></ha-icon><span>${esc(label)}</span></button>`;
+    return `<button class="${primary?"primary":""}" data-service="${service}"><ha-icon class="${busy?"spin":""}" icon="${busy?"mdi:loading":icon}"></ha-icon><span>${esc(label)}</span></button>`;
   }
   _stat(id,label) { const s=this._state(id); if(!s||["unknown","unavailable"].includes(s.state))return ""; const unit=s.attributes?.unit_of_measurement||""; return `<div class="stat" data-info="${esc(id)}"><span>${esc(label)}</span><b>${esc(s.state)}${unit?" "+esc(unit):""}</b></div>`; }
   _maintenanceKey(){return `iroomba-s7-card:${this._config.entity}:maintenance`;}
@@ -85,12 +93,12 @@ class IRoombaS7Card extends HTMLElement {
     const binFull=this._on(this._related.binFull)||v.attributes?.bin_full===true, binPresent=v.attributes?.bin_present!==false;
     const active=["cleaning","returning"].includes(state);
     const controls=[
-      this._button("start","mdi:play",state==="paused"?"Fortsæt":"Start",this._supports(FEATURES.START)&&!active,true),
-      this._button("pause","mdi:pause","Pause",this._supports(FEATURES.PAUSE)&&state==="cleaning"),
-      this._button("stop","mdi:stop","Stop",this._supports(FEATURES.STOP)&&["cleaning","paused","returning"].includes(state)),
-      this._button("return_to_base","mdi:home-import-outline","Kør hjem",this._supports(FEATURES.RETURN_HOME)&&!["docked","charging","returning"].includes(state)),
+      this._button("start","mdi:play",state==="paused"?"Fortsæt":"Start",this._supports(FEATURES.START),true),
+      this._button("pause","mdi:pause","Pause",this._supports(FEATURES.PAUSE)),
+      this._button("stop","mdi:stop","Stop",this._supports(FEATURES.STOP)),
+      this._button("return_to_base","mdi:home-import-outline","Kør hjem",this._supports(FEATURES.RETURN_HOME)),
       this._button("locate","mdi:map-marker-sound","Find",this._supports(FEATURES.LOCATE)),
-      this._button("clean_spot","mdi:target","Spot",this._supports(FEATURES.CLEAN_SPOT)&&!active)
+      this._button("clean_spot","mdi:target","Spot",this._supports(FEATURES.CLEAN_SPOT))
     ].join("");
     const stats=[this._stat(this._related.average,"Gns. rengøring"),this._stat(this._related.success,"Gennemført"),this._stat(this._related.failed,"Fejlet"),this._stat(this._related.canceled,"Afbrudt"),this._stat(this._related.total,"Ture i alt")].join("");
     const maintenance=[this._maintenance("filter","Filter","mdi:air-filter"),this._maintenance("brush","Børster","mdi:brush-variant")].join("");
