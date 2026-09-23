@@ -1,4 +1,4 @@
-// Development builds are published automatically from this branch.
+// Development builds are published automatically from this branch. Floor status icons include bin, filter, and brushes.
 const CARD_VERSION = "0.2.0-dev.9";
 
 const FEATURES = { PAUSE: 4, STOP: 8, RETURN_HOME: 16, LOCATE: 512, CLEAN_SPOT: 1024, START: 8192 };
