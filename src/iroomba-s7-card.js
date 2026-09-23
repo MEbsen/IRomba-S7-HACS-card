@@ -1,4 +1,4 @@
-// Development builds are published automatically from this branch.
+// Development builds are published automatically from this branch. Dynamic alerts stay inside the fixed scene.
 const CARD_VERSION = "0.2.0-dev.7";
 
 const FEATURES = { PAUSE: 4, STOP: 8, RETURN_HOME: 16, LOCATE: 512, CLEAN_SPOT: 1024, START: 8192 };
