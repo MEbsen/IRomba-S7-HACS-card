@@ -1,4 +1,4 @@
-// Development builds are published automatically from this branch.
+// Development builds are published automatically from this branch. Controls never wait globally for a previous service call.
 const CARD_VERSION = "0.2.0-dev.6";
 
 const FEATURES = { PAUSE: 4, STOP: 8, RETURN_HOME: 16, LOCATE: 512, CLEAN_SPOT: 1024, START: 8192 };
