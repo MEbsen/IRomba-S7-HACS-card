@@ -7,7 +7,7 @@
 
 An animated Home Assistant dashboard card for an iRobot Roomba S7 exposed through Home Assistant's official **iRobot Roomba and Braava** integration.
 
-> **Early development:** Configuration may change before v1.0.
+> **Current stable release:** `v0.2.0`. Configuration may still change before v1.0.
 
 > **Unofficial project:** This independent community project is not affiliated with, endorsed by, or sponsored by iRobot Corporation. iRobot and Roomba are trademarks of their respective owner.
 
